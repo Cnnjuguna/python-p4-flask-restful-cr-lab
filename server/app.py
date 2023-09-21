@@ -17,60 +17,49 @@ db.init_app(app)
 api = Api(app)
 
 
-class Plants(Resource):
+class PlantsResource(Resource):
     pass
 
+    def get(self):
+        response_dict = [plant.to_dict() for plant in Plant.query.all()]
 
-#     def get(self):
-#         response_dict = [plant.to_dict() for plant in Plant.query.all()]
+        response = make_response(
+            jsonify(response_dict),
+            200,
+        )
 
-#         response = make_response(
-#             jsonify(response_dict),
-#             200,
-#         )
-
-#         return response
-
-
-# api.add_resource(Plant, "/plants")
-
-
-class PlantByID(Resource):
-    pass
-    # def get(self):
-    #     response_dict = Plant.query.filter_by(id=id).first().to_dict()
-
-    #     response = make_response(
-    #         jsonify(response_dict),
-    #         200,
-    #     )
-
-    #     return response
+        return response
 
     def post(self):
+        data = request.get_json()
+        new_plant = Plant(
+            name=data.get("name"),
+            image=data.get("image"),
+            price=data.get("price"),
+        )
+
+        db.session.add(new_plant)
+        db.session.commit()
+
+        response_dict = new_plant.to_dict()
+
+        response = make_response(
+            jsonify(response_dict),
+            201,
+        )
+
+        return response
+
+
+api.add_resource(PlantsResource, "/plants")
+
+
+class PlantByIDResource(Resource):
+    def get(self, id):
         pass
 
 
-#         new_plant = Plant(
-#             name=request.form["name"],
-#             image=request.form["image"],
-#             price=request.form["price"],
-#         )
-
-#         db.session.add(new_plant)
-#         db.session.commit()
-
-#         response_dict = new_plant.to_dict()
-
-#         response = make_response(
-#             jsonify(response_dict),
-#             201,
-#         )
-
-#         return response
-
-
-# api.add_resource(PlantByID, "/plants/<int:id>")
+api.add_resource(PlantByIDResource, "/plants/<int:id>")
 
 
 if __name__ == "__main__":
