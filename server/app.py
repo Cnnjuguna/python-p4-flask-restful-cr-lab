@@ -56,7 +56,23 @@ api.add_resource(PlantsResource, "/plants")
 
 class PlantByIDResource(Resource):
     def get(self, id):
-        pass
+        some_plant = Plant.query.filter_by(id=id).first()
+
+        if some_plant:
+            response_dict = some_plant.to_dict()
+
+            response = make_response(
+                jsonify(response_dict),
+                200,
+            )
+            return response
+        else:
+            response_body = {"message": "Plant not found"}
+            response = make_response(
+                jsonify(response_body),
+                404,
+            )
+            return response
 
 
 api.add_resource(PlantByIDResource, "/plants/<int:id>")
